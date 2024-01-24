@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { Server } = require('socket.io');
 const chatController = require('./controllers/chatController');
 require('dotenv').config()
+const cors = require('cors')
 
 const app = express();
 app.use(cors())
