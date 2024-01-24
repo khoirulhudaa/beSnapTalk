@@ -1,4 +1,3 @@
-const cors = require('cors');
 const express = require('express');
 const mongoose = require('mongoose');
 const { Server } = require('socket.io');
@@ -13,13 +12,6 @@ const io = new Server(httpServer, {
         methods: ["GET", "POST"]
     }
 });
-
-const corsOptions = {
-    origin: 'https://snaptalkk.vercel.app',
-    optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
 
 // Connected on the MongoDB database
 mongoose.connect(process.env.URL_MONGOOSE, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -80,4 +72,4 @@ io.on('connection', async (socket) => {
     });
 });
 
-module.exports = httpServer;
+module.exports = app;
