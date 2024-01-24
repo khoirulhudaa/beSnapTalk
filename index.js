@@ -45,8 +45,12 @@ app.get('/test', (req, res) => {
 });
 
 const httpServer = require('http').createServer(app);
-const io = io('https://your-vercel-app.vercel.app', {
-  path: '/socket.io',
+const io = new Server(httpServer, {
+    cors: {
+        origin: "https://snaptalkk.vercel.app",
+        methods: ["GET", "POST"]
+    },
+    path: '/socket.io/(.*'
 });
 
 // Inisialisasi Socket.IO di luar fungsi penanganan HTTP
@@ -75,6 +79,7 @@ io.on('connection', async (socket) => {
     socket.on('connect_timeout', () => {
         console.error('Connection timeout');
     });
+      
 
     socket.on('disconnect', () => {
         console.log('User disconnected from ', socket.id);
