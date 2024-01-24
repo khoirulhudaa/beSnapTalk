@@ -5,6 +5,7 @@ const chatController = require('./controllers/chatController');
 require('dotenv').config()
 
 const app = express();
+app.use(cors())
 
 const httpServer = require('http').createServer(app);
 const io = new Server(httpServer, {
