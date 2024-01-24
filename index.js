@@ -1,27 +1,21 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { Server } = require('socket.io');
+const Ably = require('ably/promises');
 const chatController = require('./controllers/chatController');
-require('dotenv').config()
-const cors = require('cors')
+require('dotenv').config();
+const cors = require('cors');
 
 const app = express();
-app.use(cors())
+app.use(cors());
 
-// Connected on the MongoDB database
+// Connect to MongoDB
 mongoose.connect(process.env.URL_MONGOOSE, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => {
-        console.log('Successfully connect on database');
-    })
-    .catch((error) => {
-        console.log(error);
-    });
+    .then(() => console.log('Connected to MongoDB'))
+    .catch((error) => console.error(error));
 
-// Middleware untuk mengatur timeout
+// Timeout middleware
 app.use((req, res, next) => {
-    res.setTimeout(20000, () => {
-        res.status(408).send('Request timeout');
-    });
+    res.setTimeout(20000, () => res.status(408).send('Request timeout'));
     next();
 });
 
@@ -40,52 +34,37 @@ app.use('/account', accountRouter);
 app.use('/chat', chatRouter);
 app.use('/group', checkToken, groupRouter);
 
-app.get('/test', (req, res) => {
-    res.send('test success!');
+app.get('/test', (req, res) => res.send('test success!'));
+
+// Create Ably client instance
+const ably = new Ably.Realtime(process.env.ABLY_API_KEY);
+
+// Channel for chat messages
+const chatChannel = ably.channels.get('chat');
+
+app.listen(3600, () => {
+    console.log(`Server listening on port ${3600}`);
 });
 
-const httpServer = require('http').createServer(app);
-const io = new Server(httpServer, {
-    cors: {
-        origin: "https://snap-talk-kappa.vercel.app",
-        methods: ["GET", "POST"]
-    },
-    path: '/socket.io', // Make sure this matches with the client
+// Handle incoming chat messages
+chatChannel.subscribe('chat', async (message) => {
+    console.log('Received chat message:', message.data);
+    const result = await chatController.createChat(message.data);
+    console.log('Chat created:', result);
+    // Emit chat_received event to Ably for other clients
+    chatChannel.publish('chat_received', result);
 });
 
-// Inisialisasi Socket.IO di luar fungsi penanganan HTTP
-io.on('connection', async (socket) => {
-    console.log('socket.id:', socket.id);
-
-    socket.on('chat', async (data) => {
-        console.log('data chat:', data);
-        const result = await chatController.createChat(data);
-        console.log('result create chat:', result);
-        io.emit('chat_received', result);
-    });
-
-    socket.on('chat_remove', async (data) => {
-        console.log('data chat remove:', data);
-        const result = await chatController.removeChatById(data);
-        console.log('result remove chat:', result);
-        io.emit('chat_received', result);
-    });
-    
-    socket.on('connect_error', (error) => {
-        io.emit('chat_received', error);
-        console.error('Connection error:', error);
-    });
-      
-    socket.on('connect_timeout', () => {
-        console.error('Connection timeout');
-    });
-      
-
-    socket.on('disconnect', () => {
-        console.log('User disconnected from ', socket.id);
-    });
+// Handle chat removal requests
+chatChannel.subscribe('chat_remove', async (message) => {
+    console.log('Received chat removal request:', message.data);
+    const result = await chatController.removeChatById(message.data);
+    console.log('Chat removed:', result);
+    // Emit chat_received event to Ably for other clients
+    chatChannel.publish('chat_received', result);
 });
 
-httpServer.listen(3600, () => {
-    console.log(`Server is port ${3600}`);
+// Handle errors
+ably.connection.on('error', (error) => {
+    console.error('Ably connection error:', error);
 });
