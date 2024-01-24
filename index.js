@@ -37,7 +37,7 @@ app.use('/group', checkToken, groupRouter);
 app.get('/test', (req, res) => res.send('test success!'));
 
 // Create Ably client instance
-const ably = new Ably.Realtime(process.env.ABLY_API_KEY);
+const ably = new Ably.Realtime('e87l2A.h1L5zQ:N2VQ6cUTikKzFtbVU2quPgMpxF2P4TCIZPN_d7gSBeE');
 
 // Channel for chat messages
 const chatChannel = ably.channels.get('chat');
@@ -52,7 +52,7 @@ chatChannel.subscribe('chat', async (message) => {
     const result = await chatController.createChat(message.data);
     console.log('Chat created:', result);
     // Emit chat_received event to Ably for other clients
-    chatChannel.publish('chat_received', result);
+    await chatChannel.publish('chat_received', result);
 });
 
 // Handle chat removal requests
@@ -61,7 +61,7 @@ chatChannel.subscribe('chat_remove', async (message) => {
     const result = await chatController.removeChatById(message.data);
     console.log('Chat removed:', result);
     // Emit chat_received event to Ably for other clients
-    chatChannel.publish('chat_received', result);
+    await chatChannel.publish('chat_received', result);
 });
 
 // Handle errors
