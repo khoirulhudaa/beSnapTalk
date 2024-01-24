@@ -14,10 +14,8 @@ const io = new Server(httpServer, {
         origin: "https://snaptalkk.vercel.app",
         methods: ["GET", "POST"]
     },
-    path: '/socket.io'
 });
 
-app.use('/socket.io', express.static('static'));
 
 // Connected on the MongoDB database
 mongoose.connect(process.env.URL_MONGOOSE, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -55,28 +53,26 @@ app.get('/test', (req, res) => {
     res.send('test success!');
 });
 
-app.get('/socket.io', (req, res) => {
-    // Inisialisasi Socket.IO di luar fungsi penanganan HTTP
-    io.on('connection', async (socket) => {
-        console.log('socket.id:', socket.id);
-    
-        socket.on('chat', async (data) => {
-            console.log('data chat:', data);
-            const result = await chatController.createChat(data);
-            console.log('result create chat:', result);
-            io.emit('chat_received', result);
-        });
-    
-        socket.on('chat_remove', async (data) => {
-            console.log('data chat remove:', data);
-            const result = await chatController.removeChatById(data);
-            console.log('result remove chat:', result);
-            io.emit('chat_received', result);
-        });
-    
-        socket.on('disconnect', () => {
-            console.log('User disconnected from ', socket.id);
-        });
+// Inisialisasi Socket.IO di luar fungsi penanganan HTTP
+io.on('connection', async (socket) => {
+    console.log('socket.id:', socket.id);
+
+    socket.on('chat', async (data) => {
+        console.log('data chat:', data);
+        const result = await chatController.createChat(data);
+        console.log('result create chat:', result);
+        io.emit('chat_received', result);
+    });
+
+    socket.on('chat_remove', async (data) => {
+        console.log('data chat remove:', data);
+        const result = await chatController.removeChatById(data);
+        console.log('result remove chat:', result);
+        io.emit('chat_received', result);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected from ', socket.id);
     });
 });
 
