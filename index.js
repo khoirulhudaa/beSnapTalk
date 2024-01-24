@@ -6,13 +6,7 @@ require('dotenv').config()
 const cors = require('cors')
 
 const app = express();
-const corsOptions = {
-    origin: 'https://snaptalkk.vercel.app', // Replace with your allowed origin
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    optionsSuccessStatus: 204, // Some legacy browsers (IE11, various SmartTVs) choke on 204
-    // Add more options as needed
-  };
-app.use(cors(corsOptions))
+app.use(cors())
 
 // Connected on the MongoDB database
 mongoose.connect(process.env.URL_MONGOOSE, { useNewUrlParser: true, useUnifiedTopology: true })
