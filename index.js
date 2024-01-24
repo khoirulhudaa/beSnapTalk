@@ -47,7 +47,7 @@ app.get('/test', (req, res) => {
 const httpServer = require('http').createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: "https://snaptalkk.vercel.app",
+        origin: "https://snap-talk-kappa.vercel.app",
         methods: ["GET", "POST"]
     },
     path: '/socket.io', // Make sure this matches with the client
