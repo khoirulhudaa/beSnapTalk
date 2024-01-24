@@ -55,26 +55,28 @@ app.get('/test', (req, res) => {
     res.send('test success!');
 });
 
-// Inisialisasi Socket.IO di luar fungsi penanganan HTTP
-io.on('connection', async (socket) => {
-    console.log('socket.id:', socket.id);
-
-    socket.on('chat', async (data) => {
-        console.log('data chat:', data);
-        const result = await chatController.createChat(data);
-        console.log('result create chat:', result);
-        io.emit('chat_received', result);
-    });
-
-    socket.on('chat_remove', async (data) => {
-        console.log('data chat remove:', data);
-        const result = await chatController.removeChatById(data);
-        console.log('result remove chat:', result);
-        io.emit('chat_received', result);
-    });
-
-    socket.on('disconnect', () => {
-        console.log('User disconnected from ', socket.id);
+app.get('/socket.io', (req, res) => {
+    // Inisialisasi Socket.IO di luar fungsi penanganan HTTP
+    io.on('connection', async (socket) => {
+        console.log('socket.id:', socket.id);
+    
+        socket.on('chat', async (data) => {
+            console.log('data chat:', data);
+            const result = await chatController.createChat(data);
+            console.log('result create chat:', result);
+            io.emit('chat_received', result);
+        });
+    
+        socket.on('chat_remove', async (data) => {
+            console.log('data chat remove:', data);
+            const result = await chatController.removeChatById(data);
+            console.log('result remove chat:', result);
+            io.emit('chat_received', result);
+        });
+    
+        socket.on('disconnect', () => {
+            console.log('User disconnected from ', socket.id);
+        });
     });
 });
 
