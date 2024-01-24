@@ -50,7 +50,7 @@ const io = new Server(httpServer, {
         origin: "https://snaptalkk.vercel.app",
         methods: ["GET", "POST"]
     },
-    path: '/socket.io/(.*)'
+    path: '/socket.io', // Make sure this matches with the client
 });
 
 // Inisialisasi Socket.IO di luar fungsi penanganan HTTP
