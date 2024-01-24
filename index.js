@@ -7,7 +7,6 @@ const cors = require('cors')
 
 const app = express();
 app.use(cors())
-app.use('/socket.io', express.static('static'));
 
 const httpServer = require('http').createServer(app);
 const io = new Server(httpServer, {
@@ -18,6 +17,7 @@ const io = new Server(httpServer, {
     path: '/socket.io'
 });
 
+app.use('/socket.io', express.static('static'));
 
 // Connected on the MongoDB database
 mongoose.connect(process.env.URL_MONGOOSE, { useNewUrlParser: true, useUnifiedTopology: true })
