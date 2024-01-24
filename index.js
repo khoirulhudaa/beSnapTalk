@@ -76,4 +76,6 @@ io.on('connection', async (socket) => {
     });
 });
 
-module.exports = httpServer;
+httpServer.listen(3600, () => {
+    console.log(`Server is port ${3600}`);
+});
