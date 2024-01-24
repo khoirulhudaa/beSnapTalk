@@ -8,15 +8,6 @@ const cors = require('cors')
 const app = express();
 app.use(cors())
 
-const httpServer = require('http').createServer(app);
-const io = new Server(httpServer, {
-    cors: {
-        origin: "https://snaptalkk.vercel.app",
-        methods: ["GET", "POST"]
-    },
-});
-
-
 // Connected on the MongoDB database
 mongoose.connect(process.env.URL_MONGOOSE, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
@@ -51,6 +42,14 @@ app.use('/group', checkToken, groupRouter);
 
 app.get('/test', (req, res) => {
     res.send('test success!');
+});
+
+const httpServer = require('http').createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "https://snaptalkk.vercel.app",
+        methods: ["GET", "POST"]
+    },
 });
 
 // Inisialisasi Socket.IO di luar fungsi penanganan HTTP
