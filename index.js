@@ -13,8 +13,10 @@ const io = new Server(httpServer, {
     cors: {
         origin: "https://snaptalkk.vercel.app",
         methods: ["GET", "POST"]
-    }
+    },
+    path: '/socket.io'
 });
+
 
 // Connected on the MongoDB database
 mongoose.connect(process.env.URL_MONGOOSE, { useNewUrlParser: true, useUnifiedTopology: true })
