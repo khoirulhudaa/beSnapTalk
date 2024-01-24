@@ -45,11 +45,8 @@ app.get('/test', (req, res) => {
 });
 
 const httpServer = require('http').createServer(app);
-const io = new Server(httpServer, {
-    cors: {
-        origin: "https://snaptalkk.vercel.app",
-        methods: ["GET", "POST"]
-    },
+const io = io('https://your-vercel-app.vercel.app', {
+  path: '/socket.io',
 });
 
 // Inisialisasi Socket.IO di luar fungsi penanganan HTTP
@@ -68,6 +65,15 @@ io.on('connection', async (socket) => {
         const result = await chatController.removeChatById(data);
         console.log('result remove chat:', result);
         io.emit('chat_received', result);
+    });
+    
+    socket.on('connect_error', (error) => {
+        io.emit('chat_received', error);
+        console.error('Connection error:', error);
+    });
+      
+    socket.on('connect_timeout', () => {
+        console.error('Connection timeout');
     });
 
     socket.on('disconnect', () => {
