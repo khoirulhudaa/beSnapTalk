@@ -3,15 +3,10 @@ const mongoose = require('mongoose');
 const { Server } = require('socket.io');
 const chatController = require('./controllers/chatController');
 require('dotenv').config()
+const cors = require('cors')
 
 const app = express();
-const httpServer = require('http').createServer(app);
-const io = new Server(httpServer, {
-    cors: {
-        origin: "https://snaptalkk.vercel.app",
-        methods: ["GET", "POST"]
-    }
-});
+app.use(cors());
 
 // Connected on the MongoDB database
 mongoose.connect(process.env.URL_MONGOOSE, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -47,6 +42,14 @@ app.use('/group', checkToken, groupRouter);
 
 app.get('/test', (req, res) => {
     res.send('test success!');
+});
+
+const httpServer = require('http').createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "https://snaptalkk.vercel.app",
+        methods: ["GET", "POST"]
+    }
 });
 
 // Inisialisasi Socket.IO di luar fungsi penanganan HTTP
