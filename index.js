@@ -47,7 +47,7 @@ app.listen(3600, () => {
 });
 
 // Handle incoming chat messages
-chatChannel.subscribe('chat', async (message) => {
+chatChannel.subscribe('send_chat', async (message) => {
     console.log('Received chat message:', message.data);
     const result = await chatController.createChat(message.data);
     console.log('Chat created:', result);
