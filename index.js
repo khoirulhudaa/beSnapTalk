@@ -50,7 +50,7 @@ app.listen(3600, () => {
 chatChannel.subscribe('chat', async (message) => {
     console.log('Received chat message:', message.data);
     const result = await chatController.createChat(message.data);
-    console.log('Chat created:', result);
+    console.log('Chat_created:', result);
     // Emit chat_received event to Ably for other clients
     await chatChannel.publish('chat_received', result);
 });
@@ -59,10 +59,11 @@ chatChannel.subscribe('chat', async (message) => {
 chatChannel.subscribe('chat_remove', async (message) => {
     console.log('Received chat removal request:', message.data);
     const result = await chatController.removeChatById(message.data);
-    console.log('Chat removed:', result);
+    console.log('Chat_removed:', result);
     // Emit chat_received event to Ably for other clients
     await chatChannel.publish('chat_received', result);
 });
+
 
 // Handle errors
 ably.connection.on('error', (error) => {
